@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sticky Notes App</title>
+    <style>
+        :root {
+            --purple: #9c27b0;
+            --blue: #2196f3;
+            --green: #4caf50;
+            --yellow: #ffeb3b;
+            --orange: #ff9800;
+            --pink: #e91e63;
+        }
+        
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .app-container {
+            display: flex;
+            gap: 30px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .form-section {
+            flex: 1;
+            max-width: 400px;
+        }
+        
+        .notes-section {
+            flex: 2;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+        
+        .note-form {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-family: inherit;
+        }
+        
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #45a049;
+        }
+        
+        .notes-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            align-content: start;
+        }
+        
+        .note {
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+            position: relative;
+            transform: rotate(-1deg);
+            transition: transform 0.3s;
+            height: 200px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .note:hover {
+            transform: rotate(0deg) scale(1.05);
+        }
+        
+        .note h3 {
+            margin-top: 0;
+            border-bottom: 1px dashed rgba(0,0,0,0.2);
+            padding-bottom: 5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .note p {
+            margin-bottom: 0;
+            flex-grow: 1;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 5;
+            -webkit-box-orient: vertical;
+        }
+        
+        .note-date {
+            font-size: 0.8em;
+            color: rgba(0,0,0,0.6);
+            margin-top: 10px;
+            text-align: right;
+        }
+        
+        .delete-note {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: rgba(0,0,0,0.2);
+            border: none;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .color-options {
+            display: flex;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        
+        .color-option {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+        
+        .color-option.selected {
+            border-color: #333;
+            transform: scale(1.1);
+        }
+
+        @media (max-width: 1000px) {
+            .app-container {
+                flex-direction: column;
+            }
+            .form-section {
+                max-width: 100%;
+            }
+            .notes-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>My Sticky Notes</h1>
+    
+    <div class="app-container">
+        <div class="form-section">
+            <div class="note-form">
+                <div class="form-group">
+                    <label for="note-title">Title:</label>
+                    <input type="text" id="note-title" placeholder="Enter note title">
+                </div>
+                
+                <div class="form-group">
+                    <label for="note-content">Content:</label>
+                    <textarea id="note-content" placeholder="Write your note here..."></textarea>
+                </div>
+                
+                <div class="color-options">
+                    <div class="color-option selected" style="background-color: var(--purple);" data-color="purple"></div>
+                    <div class="color-option" style="background-color: var(--blue);" data-color="blue"></div>
+                    <div class="color-option" style="background-color: var(--green);" data-color="green"></div>
+                    <div class="color-option" style="background-color: var(--yellow);" data-color="yellow"></div>
+                    <div class="color-option" style="background-color: var(--orange);" data-color="orange"></div>
+                    <div class="color-option" style="background-color: var(--pink);" data-color="pink"></div>
+                </div>
+                
+                <button id="save-note">Save Note</button>
+            </div>
+        </div>
+        
+        <div class="notes-section">
+            <div class="notes-grid" id="notes-container">
+                <!-- Notes will appear here in 2x2 grid -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Current selected color
+        let selectedColor = 'purple';
+        
+        // Color selection
+        document.querySelectorAll('.color-option').forEach(option => {
+            option.addEventListener('click', function() {
+                document.querySelectorAll('.color-option').forEach(opt => opt.classList.remove('selected'));
+                this.classList.add('selected');
+                selectedColor = this.dataset.color;
+            });
+        });
+        
+        // Load notes from local storage initially
+        function loadNotes() {
+            // In real implementation, this would fetch from AWS DynamoDB via API Gateway
+            const notes = JSON.parse(localStorage.getItem('sticky-notes') || '[]');
+            const container = document.getElementById('notes-container');
+            
+            container.innerHTML = '';
+            
+            notes.forEach(note => {
+                createNoteElement(note);
+            });
+        }
+        
+        // Create a note element
+        function createNoteElement(note) {
+            const container = document.getElementById('notes-container');
+            const noteElement = document.createElement('div');
+            
+            noteElement.className = 'note';
+            noteElement.style.backgroundColor = getColorValue(note.color);
+            
+            noteElement.innerHTML = `
+                <button class="delete-note" data-id="${note.id}">×</button>
+                <h3>${note.title}</h3>
+                <p>${note.content}</p>
+                <div class="note-date">${new Date(note.date).toLocaleString()}</div>
+            `;
+            
+            container.appendChild(noteElement);
+            
+            // Add delete event
+            noteElement.querySelector('.delete-note').addEventListener('click', function() {
+                deleteNote(note.id);
+            });
+        }
+        
+        // Get CSS color value
+        function getColorValue(colorName) {
+            const colors = {
+                purple: 'var(--purple)',
+                blue: 'var(--blue)',
+                green: 'var(--green)',
+                yellow: 'var(--yellow)',
+                orange: 'var(--orange)',
+                pink: 'var(--pink)'
+            };
+            return colors[colorName] || colors.purple;
+        }
+        
+        // Save a new note
+        document.getElementById('save-note').addEventListener('click', function() {
+            const title = document.getElementById('note-title').value.trim();
+            const content = document.getElementById('note-content').value.trim();
+            
+            if (!title || !content) {
+                alert('Please enter both title and content');
+                return;
+            }
+            
+            const newNote = {
+                id: Date.now().toString(),
+                title,
+                content,
+                color: selectedColor,
+                date: new Date().toISOString()
+            };
+            
+            // In real implementation, this would save to AWS DynamoDB via API Gateway
+            const notes = JSON.parse(localStorage.getItem('sticky-notes') || '[]');
+            notes.push(newNote);
+            localStorage.setItem('sticky-notes', JSON.stringify(notes));
+            
+            // Create and display the new note
+            createNoteElement(newNote);
+            
+            // Clear the form
+            document.getElementById('note-title').value = '';
+            document.getElementById('note-content').value = '';
+        });
+        
+        // Delete a note
+        function deleteNote(id) {
+            // In real implementation, this would delete from AWS DynamoDB via API Gateway
+            let notes = JSON.parse(localStorage.getItem('sticky-notes') || '[]');
+            notes = notes.filter(note => note.id !== id);
+            localStorage.setItem('sticky-notes', JSON.stringify(notes));
+            
+            // Refresh the display
+            loadNotes();
+        }
+        
+        // Initial load
+        loadNotes();
+    </script>
+</body>
+</html>
